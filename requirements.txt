@@ -1,0 +1,8 @@
+# pip install requests aiogram beautifulsoup4 lxml xlwt xlrd
+
+requests
+aiogram
+beautifulsoup4
+lxml
+xlwt
+xlrd
