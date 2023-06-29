@@ -147,6 +147,13 @@ def save_from_userside(table, t_o):
                         break
                     else:
                         street_is_norm = True
+            elif district == "Московский":
+                for our_street in west_in_moscow:
+                    if our_street in address:
+                        street_is_norm = False
+                        break
+                    else:
+                        street_is_norm = True
         if not street_is_norm:
             continue
 

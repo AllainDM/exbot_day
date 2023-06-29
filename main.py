@@ -139,22 +139,17 @@ async def echo_func(message: types.Message):
     # start_day = date_now - timedelta(1)  # здесь мы выставляем минус день
     # date_now = start_day.strftime("%d.%m.%Y")
     command = message.get_full_command()[1].split('.')
-    # Если есть аргументы
+    # Если есть аргументы. Должна быть желаемая дата
     if len(command) > 1:
         print("Предварительно дата есть")
-        print(command)
-        print(len(command))
-        print("Дата")
         # Получим год, чтобы подставить в случае необходимости
         date_now = datetime.now()
         year_now = date_now.strftime("%Y")
-        print(f"year_now1235: {year_now}")
         # Проверка на дату, аргументы должны быть числом
         for i in command:
             try:
                 # Получаем мы конечно же строку, попытаемся ее преобразовать
                 num = int(i)
-                print(type(num))
                 if type(num) != int:
                     await bot.send_message(message.chat.id, f"Дата введена некорректно1")
                     return
@@ -267,12 +262,18 @@ async def echo_func(message: types.Message):
         await bot.send_document(message.chat.id, "Возможно найденный файл не найден")
 
 
+# Самозапускающая функция собирающая дневной отчет.
+# !!! Не для Эхо бота
+def get_day_report():
+    pass
+
+
 # Для ТО Запад
 def day_west(start_day, date_now, date_for_goodscat, name_table):
     t_o = "TOWest"  # Название для файла
     t_o_link = "TOWest"  # Для ссылки, иногда требуется сделать два запроса
     answer = get_html_users(date_now, start_day, name_table, t_o, t_o_link)
-    print(answer)
+    # print(answer)
     # Добавим парсер Goodscat
     # Список районов, как цикл для перебора и аргумент для ссылки парсеру
     areas = ["Адмиралтейский", "Василеостровский", "Кировский", "Московский",
@@ -280,14 +281,14 @@ def day_west(start_day, date_now, date_for_goodscat, name_table):
     # Два статуса собираем отдельно
     status = ["archive", "tariff"]
     # Запустим парсер меняя статус и район
-    for st in status:
-        for ar in areas:
-            time.sleep(5)  # Небольшая задержка от бана
-            answer_gk = get_html_goodscat_for_day(date_for_goodscat, ar, t_o, st)
-            answer += answer_gk
-            print(answer_gk)
-    time.sleep(5)  # Небольшая задержка от бана
-    print(answer)
+    # for st in status:
+    #     for ar in areas:
+    #         time.sleep(5)  # Небольшая задержка от бана
+    #         answer_gk = get_html_goodscat_for_day(date_for_goodscat, ar, t_o, st)
+    #         answer += answer_gk
+    #         print(answer_gk)
+    # time.sleep(5)  # Небольшая задержка от бана
+    # print(answer)
 
     to_exel.save_to_exel_from_userside(name_table, answer, t_o)
 
@@ -312,10 +313,10 @@ def day_south(start_day, date_now, date_for_goodscat, name_table):
     # Два статуса собираем отдельно
     status = ["archive", "tariff"]
     # Запустим парсер меняя статус и район
-    for st in status:
-        for ar in areas:
-            time.sleep(5)  # Небольшая задержка от бана
-            answer += get_html_goodscat_for_day(date_for_goodscat, ar, t_o, st)
+    # for st in status:
+    #     for ar in areas:
+    #         time.sleep(5)  # Небольшая задержка от бана
+    #         answer += get_html_goodscat_for_day(date_for_goodscat, ar, t_o, st)
 
     to_exel.save_to_exel_from_userside(name_table, answer, t_o)
 
@@ -337,10 +338,10 @@ def day_north(start_day, date_now, date_for_goodscat, name_table):
     # Два статуса собираем отдельно
     status = ["archive", "tariff"]
     # Запустим парсер меняя статус и район
-    for st in status:
-        for ar in areas:
-            time.sleep(5)  # Небольшая задержка от бана
-            answer += get_html_goodscat_for_day(date_for_goodscat, ar, t_o, st)
+    # for st in status:
+    #     for ar in areas:
+    #         time.sleep(5)  # Небольшая задержка от бана
+    #         answer += get_html_goodscat_for_day(date_for_goodscat, ar, t_o, st)
     # Для севера ЭХ сверху
     answer += get_html_users(date_now, start_day, name_table, t_o, t_o_link)
     to_exel.save_to_exel_from_userside(name_table, answer, t_o)
@@ -362,10 +363,10 @@ def day_east(start_day, date_now, date_for_goodscat, name_table):
     # Два статуса собираем отдельно
     status = ["archive", "tariff"]
     # Запустим парсер меняя статус и район
-    for st in status:
-        for ar in areas:
-            time.sleep(5)  # Небольшая задержка от бана
-            answer += get_html_goodscat_for_day(date_for_goodscat, ar, t_o, st)
+    # for st in status:
+    #     for ar in areas:
+    #         time.sleep(5)  # Небольшая задержка от бана
+    #         answer += get_html_goodscat_for_day(date_for_goodscat, ar, t_o, st)
 
     to_exel.save_to_exel_from_userside(name_table, answer, t_o)
 
@@ -456,6 +457,11 @@ def get_html_users(date_now, start_day, name_table, t_o, t_o_link):
             soup = BeautifulSoup(html.text, 'lxml')
             table = soup.find_all('tr', class_="cursor_pointer")
             answer = parser_userside.save_from_userside(table, t_o)
+            # Для спорных районов нужно отфильтровать улицы
+            # if t_o == "TOWest" or t_o == "TOSouth":
+            #     if area == "Кировский" or area == "Московский" or area == "Фрунзенский":
+            #         print("Есть спорные районы")
+            #         table = parser_goodscat.street_filter(table, t_o)
             return answer
         else:
             print("error")
@@ -606,14 +612,13 @@ def get_html_goodscat_for_day(date, area, t_o, status):
             # Преобразуем кодировку, на сайте фигня нечитаемая
             html.encoding = "windows-1251"
             soup = BeautifulSoup(html.text, 'lxml')
-            zagolovok = soup.h1
-            print(zagolovok)
+            # zagolovok = soup.h1
+            # print(zagolovok)
             # !!!! Там есть класс td_red, зачем и почему непонятно
             table = soup.find_all('tr', class_="td1")
             # Добавим выделенные красным, у них свой класс
             table += soup.find_all('tr', class_="td_red")
             # Для спорных районов нужно отфильтровать улицы
-            # Пока только для Запада
             if t_o == "TOWest" or t_o == "TOSouth":
                 if area == "Кировский" or area == "Московский" or area == "Фрунзенский":
                     print("Есть спорные районы")

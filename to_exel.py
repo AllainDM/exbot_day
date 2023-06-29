@@ -30,7 +30,7 @@ def save_to_exel_from_userside(table_name, arr, t_o):
     ws = wb.add_sheet(f'{table_name}')
     num_string = 2  # Стартовый номер строки для екселя
     for i in arr:
-        print(i)
+        print(f"список3143 {i}")
         ws.write(num_string, 0, i[0])  # Бренд
         ws.write(num_string, 1, i[1])  # Дата
         ws.write(num_string, 2, i[2])  # Номер договора
